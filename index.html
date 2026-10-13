@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#ffffff">
-<title>MK Photography | Wedding, Event & Corporate Photographer in Chennai & Kodavasal</title>
-<meta name="description" content="MK Photography by M. Manikandan. Wedding, event and corporate photography in Chennai &amp; Kodavasal. Call +91 6382 787196 to book.">
+<title>MK Photography | Wedding, Pre-Wedding, Portrait & Event Photographer | Chennai & Kodavasal</title>
+<meta name="description" content="MK Photography by M. Manikandan. Wedding, pre-wedding, portrait, maternity, birthday and event photography in Chennai &amp; Kodavasal. Call +91 6382 787196 to book.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -46,8 +46,13 @@
   .menu-btn { display: none; background: none; border: 0; color: var(--text); font-size: 1.6rem; cursor: pointer; }
 
   /* Hero */
-  .hero { min-height: 100vh; display: flex; align-items: center; text-align: center;
-    background: linear-gradient(rgba(255,255,255,.55), rgba(246,239,228,.88)), url('assets/hero.jpg') center/cover, linear-gradient(135deg, #fffdf9, #efe4d2); }
+  .hero { position: relative; overflow: hidden; min-height: 100vh; display: flex; align-items: center; text-align: center;
+    background: url('assets/hero.jpg') center/cover, linear-gradient(135deg, #fffdf9, #efe4d2); }
+  .hero::after { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(rgba(255,255,255,.5), rgba(246,239,228,.88)); }
+  .hero .container { position: relative; z-index: 2; }
+  .hero-slides { position: absolute; inset: -40px; z-index: 0; will-change: transform; }
+  .hero-slide { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transform: scale(1.02); transition: opacity 1.6s ease, transform 0s 1.6s; }
+  .hero-slide.on { opacity: 1; transform: scale(1.12); transition: opacity 1.6s ease, transform 9s linear; }
   .hero-logo { width: min(260px, 60%); margin: 0 auto 26px; border-radius: 14px; box-shadow: 0 14px 40px rgba(60,40,20,.25); }
   .hero h1 { font-size: clamp(2.4rem, 7vw, 4.8rem); margin-bottom: 20px; }
   .hero p { color: var(--muted); max-width: 560px; margin: 0 auto 36px; font-size: 1.05rem; }
@@ -66,10 +71,10 @@
 
   /* Services */
   .services { background: var(--bg-soft); }
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 22px; }
-  .card { background: var(--bg); border: 1px solid #6b5a4a26; border-radius: var(--radius); padding: 32px 26px; transition: transform .25s, border-color .25s; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .card { position: relative; overflow: hidden; background: var(--bg); border: 1px solid #6b5a4a26; border-radius: var(--radius); padding: 32px 26px; transition: transform .25s, border-color .25s; }
   .card { box-shadow: 0 6px 20px rgba(107,90,74,.07); }
-  .card:hover { transform: translateY(-5px); border-color: var(--accent); }
+  .card:hover { border-color: var(--accent); }
   .card .icon { font-size: 1.8rem; margin-bottom: 14px; }
   .card h3 { font-size: 1.25rem; margin-bottom: 8px; }
   .card p { color: var(--muted); font-size: .93rem; }
@@ -78,7 +83,8 @@
   /* About */
   .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
   .about-img { aspect-ratio: 4/5; border-radius: var(--radius); background: linear-gradient(135deg, #efe4d2, #f6efe4) center/cover; }
-  .stats { display: flex; gap: 40px; margin-top: 30px; }
+  .stats { display: flex; flex-wrap: wrap; gap: 18px 36px; margin-top: 30px; }
+  .about-grid > * { min-width: 0; }
   .stats strong { display: block; font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--sky); }
   .stats span { color: var(--muted); font-size: .85rem; }
 
@@ -104,9 +110,9 @@
 
   /* Categories */
   .loading { color: var(--muted); }
-  .cats { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; }
-  .cat { background: var(--bg); border: 1px solid #6b5a4a26; border-radius: var(--radius); overflow: hidden; cursor: pointer; text-align: left; font-family: inherit; color: inherit; padding: 0; box-shadow: 0 6px 20px rgba(107,90,74,.07); transition: transform .25s, border-color .25s; }
-  .cat:hover { transform: translateY(-5px); border-color: var(--accent); }
+  .cats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .cat { position: relative; background: var(--bg); border: 1px solid #6b5a4a26; border-radius: var(--radius); overflow: hidden; cursor: pointer; text-align: left; font-family: inherit; color: inherit; padding: 0; box-shadow: 0 6px 20px rgba(107,90,74,.07); transition: transform .25s, border-color .25s; }
+  .cat:hover { border-color: var(--accent); }
   .cat-img { aspect-ratio: 4/3; background: linear-gradient(135deg, #efe4d2, #f6efe4) center/cover; transition: transform .5s; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: .9rem; }
   .cat-wrap { overflow: hidden; }
   .cat:hover .cat-img { transform: scale(1.05); }
@@ -114,28 +120,67 @@
   .cat-info h3 { font-size: 1.35rem; }
   .cat-info span { color: var(--sky); font-size: .85rem; font-weight: 600; }
 
+  /* Mouse-tilt glare */
+  .cat::after, .card::after, .gi::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .3s;
+    background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,.55), transparent 55%); }
+  .cat:hover::after, .card:hover::after, .gi:hover::after { opacity: 1; }
+
   /* Gallery */
   .gallery { position: fixed; inset: 0; background: var(--bg); z-index: 90; overflow-y: auto; display: none; }
   .gallery.open { display: block; }
-  .gallery-head { position: sticky; top: 0; background: rgba(255,255,255,.94); backdrop-filter: blur(10px); border-bottom: 1px solid #6b5a4a26; display: flex; align-items: center; gap: 18px; padding: 14px 4%; z-index: 2; }
+  .gallery-head { position: sticky; top: 0; background: rgba(255,255,255,.94); backdrop-filter: blur(10px); border-bottom: 1px solid #6b5a4a26; display: flex; align-items: center; gap: 14px; padding: 14px 4%; z-index: 2; }
   .gallery-head h3 { font-size: 1.5rem; }
   .gallery-head span { color: var(--muted); font-size: .9rem; margin-left: auto; }
-  .back { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 8px 20px; border-radius: 999px; cursor: pointer; font-family: inherit; font-size: .9rem; }
-  .back:hover { background: var(--accent); color: #fff; }
+  .back, .show-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 8px 20px; border-radius: 999px; cursor: pointer; font-family: inherit; font-size: .9rem; }
+  .back:hover, .show-btn { background: var(--accent); color: #fff; }
+  .show-btn:hover { filter: brightness(1.08); }
   .gallery-grid { column-width: 260px; column-gap: 14px; padding: 24px 4% 60px; max-width: 1280px; margin: 0 auto; }
-  .gallery-grid img { width: 100%; display: block; margin-bottom: 14px; border-radius: 8px; cursor: zoom-in; background: #efe4d2; break-inside: avoid; transition: opacity .2s; }
-  .gallery-grid img:hover { opacity: .9; }
+  .gi { position: relative; margin-bottom: 14px; border-radius: 8px; overflow: hidden; cursor: zoom-in; break-inside: avoid; background: #efe4d2; will-change: transform; }
+  .gi img, .gi video { width: 100%; display: block; }
+  .gi .play { position: absolute; right: 12px; bottom: 12px; width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,.92); color: #2b2622; display: flex; align-items: center; justify-content: center; font-size: .85rem; padding-left: 2px; z-index: 1; }
   .empty { text-align: center; color: var(--muted); padding: 80px 20px; column-span: all; }
+  .cat-img video { width: 100%; height: 100%; object-fit: cover; }
 
-  /* Lightbox */
-  .lightbox { position: fixed; inset: 0; background: rgba(246,239,228,.98); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
-  .lightbox.open { display: flex; }
-  .lightbox img { max-width: 100%; max-height: 88vh; border-radius: 8px; box-shadow: 0 10px 40px rgba(60,40,20,.25); }
-  .lightbox button { position: absolute; background: none; border: 0; color: #2b2622; cursor: pointer; }
-  .lb-close { top: 16px; right: 24px; font-size: 2.4rem; }
-  .lb-nav { top: 50%; transform: translateY(-50%); font-size: 3.4rem; padding: 10px 18px; }
-  .lb-prev { left: 8px; } .lb-next { right: 8px; }
-  .lb-count { position: absolute; bottom: 14px; left: 0; right: 0; text-align: center; color: var(--muted); font-size: .85rem; }
+  /* Slideshow */
+  .show { position: fixed; inset: 0; z-index: 110; background: #14110f; display: none; overflow: hidden; color: #fff;
+    --rx: 0deg; --ry: 0deg; --tx: 0px; --ty: 0px; --bx: 0px; --by: 0px; --gx: 50%; --gy: 50%; }
+  .show.open { display: block; }
+  .slide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .slide-bg { position: absolute; inset: -90px; background-size: cover; background-position: center; filter: blur(42px) brightness(.55) saturate(1.3);
+    transform: translate3d(var(--bx), var(--by), 0) scale(1.1); will-change: transform; }
+  .slide-bg.dark { background: radial-gradient(circle at 50% 40%, #3a2f27, #14110f 70%); filter: none; }
+  .slide-fg { position: relative; transform: perspective(1400px) rotateY(var(--ry)) rotateX(var(--rx)) translate3d(var(--tx), var(--ty), 0); will-change: transform; }
+  .slide-fg::after { content: ''; position: absolute; inset: 0; border-radius: 6px; pointer-events: none; background: radial-gradient(circle at var(--gx) var(--gy), rgba(255,255,255,.2), transparent 55%); }
+  .slide-fg .kb { animation: kb var(--dur, 6500ms) ease-out forwards; }
+  .slide.is-video .kb { animation: none; }
+  .slide-fg img, .slide-fg video { display: block; max-width: 88vw; max-height: 80vh; border-radius: 6px; box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+  .slide-fg video { cursor: pointer; }
+  @keyframes kb { from { transform: scale(1); } to { transform: scale(1.07) translate(-.6%, -.6%); } }
+  .slide.in-a { animation: inA 1.2s cubic-bezier(.2,.7,.2,1) both; }
+  .slide.in-b { animation: inB 1.2s cubic-bezier(.2,.7,.2,1) both; }
+  .slide.in-c { animation: inC 1.2s cubic-bezier(.2,.7,.2,1) both; }
+  .slide.leave { animation: outA .9s ease forwards; pointer-events: none; }
+  @keyframes inA { from { opacity: 0; transform: scale(1.18) rotate(-2deg); filter: blur(14px); } to { opacity: 1; transform: none; filter: none; } }
+  @keyframes inB { from { opacity: 0; transform: translateX(10vw) scale(.92); filter: blur(10px); } to { opacity: 1; transform: none; filter: none; } }
+  @keyframes inC { from { opacity: 0; transform: translateY(8vh) scale(.82); filter: blur(10px); } to { opacity: 1; transform: none; filter: none; } }
+  @keyframes outA { to { opacity: 0; transform: scale(1.06); filter: blur(8px); } }
+  .show-ui { position: absolute; inset: 0; pointer-events: none; transition: opacity .4s; z-index: 5; }
+  .show-ui > * { pointer-events: auto; }
+  .show.idle .show-ui { opacity: 0; }
+  .show.idle { cursor: none; }
+  .show-top { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 16px 22px; background: linear-gradient(rgba(0,0,0,.55), transparent); font-family: 'Playfair Display', serif; font-size: 1.25rem; }
+  .show-top div { display: flex; gap: 10px; }
+  .show button { background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.28); color: #fff; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; font-size: 1.05rem; backdrop-filter: blur(6px); font-family: inherit; }
+  .show button:hover { background: rgba(255,255,255,.3); }
+  .show-nav { position: absolute; top: 50%; transform: translateY(-50%); font-size: 2rem !important; line-height: 1; padding-bottom: 4px; }
+  .show-nav.prev { left: 18px; } .show-nav.next { right: 18px; }
+  .show-bottom { position: absolute; bottom: 0; left: 0; right: 0; display: flex; align-items: center; gap: 16px; padding: 22px; background: linear-gradient(transparent, rgba(0,0,0,.6)); }
+  .show-bottom span { font-size: .85rem; color: #e6dccd; min-width: 54px; }
+  .show-progress { flex: 1; height: 3px; background: rgba(255,255,255,.25); border-radius: 3px; overflow: hidden; }
+  .show-progress i { display: block; height: 100%; width: 0; background: #d9b77a; }
+  @keyframes bar { from { width: 0; } to { width: 100%; } }
+  @media (prefers-reduced-motion: reduce) { .slide-fg .kb, .hero-slide.on { animation: none; } .slide { animation: none !important; } }
+  @media (max-width: 800px) { .slide-fg img, .slide-fg video { max-width: 94vw; max-height: 70vh; } .show-nav { display: none; } }
 
   @media (max-width: 800px) {
     section { padding: 64px 0; }
@@ -145,6 +190,8 @@
     .nav-cta { display: none; }
     .about-grid, .contact-grid { grid-template-columns: 1fr; gap: 36px; }
   }
+  @media (max-width: 900px) { .cats, .cards { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .cats, .cards { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -166,12 +213,13 @@
 
 <!-- Hero -->
 <section class="hero" id="home">
+  <div class="hero-slides" id="heroSlides" data-depth="-16"></div>
   <div class="container">
-    <img onerror="this.style.display='none'" src="assets/Logo.png" alt="MK Photography logo" class="hero-logo">
-    <p class="eyebrow">Chennai &amp; Kodavasal</p>
-    <h1>Capturing moments<br>that last forever</h1>
-    <p>Wedding, event and corporate photography — told with honest light and a timeless eye.</p>
-    <div class="actions">
+    <img onerror="this.style.display='none'" src="assets/Logo.png" alt="MK Photography logo" class="hero-logo" data-depth="18">
+    <p class="eyebrow" data-depth="10">Chennai &amp; Kodavasal</p>
+    <h1 data-depth="12">Capturing moments<br>that last forever</h1>
+    <p data-depth="7">Wedding, pre-wedding, portrait, maternity, birthday and event photography — told with honest light and a timeless eye.</p>
+    <div class="actions" data-depth="6">
       <a href="#portfolio" class="btn btn-primary">View Portfolio</a>
       <a href="#contact" class="btn btn-ghost">Get a Quote</a>
     </div>
@@ -194,6 +242,7 @@
     <button class="back" id="galBack" type="button">← Back</button>
     <h3 id="galTitle"></h3>
     <span id="galCount"></span>
+    <button class="show-btn" id="galShow" type="button">▶ Slideshow</button>
   </div>
   <div class="gallery-grid" id="galGrid"></div>
 </div>
@@ -203,11 +252,14 @@
   <div class="container">
     <p class="eyebrow">Services</p>
     <h2 class="section-title">What I Offer</h2>
-    <p class="section-sub">Wedding, Event and Corporate. Call or WhatsApp for a custom quote.</p>
+    <p class="section-sub">Wedding, Pre-Wedding, Portrait, Maternity, Birthday and Events. Call or WhatsApp for a custom quote.</p>
     <div class="cards">
       <div class="card"><div class="icon">💍</div><h3>Wedding</h3><p>Full-day coverage of every ritual and emotion, candid and traditional, with a beautifully edited gallery.</p><div class="price">Contact for quote</div></div>
-      <div class="card"><div class="icon">🎉</div><h3>Event</h3><p>Birthdays, engagements, baby showers, cultural and family functions covered with care.</p><div class="price">Contact for quote</div></div>
-      <div class="card"><div class="icon">🏢</div><h3>Corporate</h3><p>Conferences, launches, team events and professional shoots for your brand.</p><div class="price">Contact for quote</div></div>
+      <div class="card"><div class="icon">💑</div><h3>Pre-Wedding</h3><p>Romantic, cinematic shoots before the big day, at the locations you love.</p><div class="price">Contact for quote</div></div>
+      <div class="card"><div class="icon">📸</div><h3>Portrait</h3><p>Individual, couple and family portraits in natural light, indoors or outdoors.</p><div class="price">Contact for quote</div></div>
+      <div class="card"><div class="icon">🤰</div><h3>Maternity</h3><p>Soft, elegant sessions that celebrate this special chapter of your life.</p><div class="price">Contact for quote</div></div>
+      <div class="card"><div class="icon">🎂</div><h3>Birthday</h3><p>Kids' and milestone birthdays captured with all the joy and fun.</p><div class="price">Contact for quote</div></div>
+      <div class="card"><div class="icon">🎉</div><h3>Events</h3><p>Engagements, baby showers, cultural, family and corporate events covered with care.</p><div class="price">Contact for quote</div></div>
     </div>
   </div>
 </section>
@@ -223,9 +275,9 @@
       <p style="color:var(--muted);margin-bottom:14px">From our first conversation to the final delivery, I make sure you enjoy a relaxed, friendly, and professional experience.</p>
       <p style="color:var(--text);font-family:'Playfair Display',serif;font-size:1.2rem;font-style:italic;margin-top:20px"><strong style="font-weight:600">MK Photography</strong> — Capturing Moments, Creating Memories.</p>
       <div class="stats">
-        <div><strong>Wedding</strong><span>Specialist</span></div>
-        <div><strong>Event</strong><span>Coverage</span></div>
-        <div><strong>Corporate</strong><span>Shoots</span></div>
+        <div><strong>Weddings</strong><span>&amp; Pre-Wedding</span></div>
+        <div><strong>Portraits</strong><span>&amp; Maternity</span></div>
+        <div><strong>Events</strong><span>&amp; Birthdays</span></div>
       </div>
     </div>
   </div>
@@ -264,7 +316,7 @@
       <input type="email" name="email" placeholder="Email" required>
       <input type="tel" name="phone" placeholder="Phone number">
       <select name="service">
-        <option>Wedding</option><option>Event</option><option>Corporate</option>
+        <option>Wedding</option><option>Pre-Wedding</option><option>Portrait</option><option>Maternity</option><option>Birthday</option><option>Events</option>
       </select>
       <input type="date" name="date">
       <textarea name="message" placeholder="Tell me about your shoot…"></textarea>
@@ -282,28 +334,49 @@
   © <span id="year"></span> MK Photography · M. Manikandan. All rights reserved.
 </footer>
 
-<div class="lightbox" id="lightbox">
-  <button class="lb-close" id="lbClose" aria-label="Close">×</button>
-  <button class="lb-nav lb-prev" id="lbPrev" aria-label="Previous">‹</button>
-  <img id="lbImg" alt="">
-  <button class="lb-nav lb-next" id="lbNext" aria-label="Next">›</button>
-  <span class="lb-count" id="lbCount"></span>
+<div class="show" id="show" aria-hidden="true">
+  <div id="showStage"></div>
+  <div class="show-ui">
+    <div class="show-top"><span id="showTitle"></span>
+      <div>
+        <button id="showMute" type="button" aria-label="Mute" style="display:none">🔊</button>
+        <button id="showFs" type="button" aria-label="Fullscreen">⛶</button>
+        <button id="showClose" type="button" aria-label="Close">✕</button>
+      </div>
+    </div>
+    <button class="show-nav prev" id="showPrev" type="button" aria-label="Previous">‹</button>
+    <button class="show-nav next" id="showNext" type="button" aria-label="Next">›</button>
+    <div class="show-bottom">
+      <button id="showPlay" type="button" aria-label="Play or pause">❚❚</button>
+      <span id="showCount"></span>
+      <div class="show-progress"><i id="showBar"></i></div>
+    </div>
+  </div>
 </div>
 
 <script>
-  // ===== Settings =====
-  // Photos are read automatically from these GitHub folders. Just upload photos into them.
+  // ================= Settings =================
+  // Photos AND videos are read automatically from these GitHub folders. Just upload files into them.
   const CATEGORIES = [
-    { key: 'wedding',   title: 'Wedding',   folder: 'assets/wedding'   },
-    { key: 'event',     title: 'Event',     folder: 'assets/event'     },
-    { key: 'corporate', title: 'Corporate', folder: 'assets/corporate' }
+    { key: 'wedding',     title: 'Wedding',     folder: 'assets/wedding'     },
+    { key: 'portrait',    title: 'Portrait',    folder: 'assets/portrait'    },
+    { key: 'pre-wedding', title: 'Pre-Wedding', folder: 'assets/pre-wedding' },
+    { key: 'maternity',   title: 'Maternity',   folder: 'assets/maternity'   },
+    { key: 'birthday',    title: 'Birthday',    folder: 'assets/birthday'    },
+    { key: 'events',      title: 'Events',      folder: 'assets/events'      }
   ];
   // Used only when the site is opened from somewhere other than username.github.io
   const FALLBACK_REPO = { owner: 'dreamframephotography', repo: 'MK-Photography' };
-  // Backup list (only used if GitHub's folder listing is unavailable). Example: wedding: ['a.jpg','b.jpg']
-  const MANUAL = { wedding: [], event: [], corporate: [] };
+  // Backup list (only used if GitHub's folder listing is unavailable). Example: wedding: ['a.jpg','b.mp4']
+  const MANUAL = {};
+  const SLIDE_MS = 5000;
 
   const IMG_RE = /\.(jpe?g|png|webp|avif|gif)$/i;
+  const VID_RE = /\.(mp4|webm|m4v|mov|ogv)$/i;
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const enc = n => encodeURIComponent(n).replace(/'/g, '%27');
+  const $ = id => document.getElementById(id);
 
   function repoInfo() {
     const host = location.hostname;
@@ -319,31 +392,88 @@
   async function loadFolder(cat) {
     const { owner, repo } = repoInfo();
     const url = `https://api.github.com/repos/${owner}/${repo}/contents/${cat.folder}`;
-    const ck = 'mk_' + url;
+    const ck = 'mk2_' + url;
     try {
       const c = JSON.parse(sessionStorage.getItem(ck) || 'null');
       if (c && Date.now() - c.t < 120000) return c.list;
     } catch (e) {}
-    let list = [];
+    let names = [];
     try {
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
-        list = data.filter(f => f.type === 'file' && IMG_RE.test(f.name))
-                   .map(f => f.name)
-                   .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+        names = data.filter(f => f.type === 'file' && (IMG_RE.test(f.name) || VID_RE.test(f.name))).map(f => f.name);
       }
     } catch (e) {}
-    if (!list.length) list = MANUAL[cat.key] || [];
-    list = list.map(n => `${cat.folder}/${encodeURIComponent(n)}`);
+    if (!names.length) names = MANUAL[cat.key] || [];
+    names.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+    const list = names.map(n => ({ src: `${cat.folder}/${enc(n)}`, type: VID_RE.test(n) ? 'video' : 'image' }));
     try { sessionStorage.setItem(ck, JSON.stringify({ t: Date.now(), list })); } catch (e) {}
     return list;
   }
 
-  // ===== Category cards =====
-  const catsEl = document.getElementById('cats');
-  const photosByCat = {};
+  // ================= Mouse tilt (3D + glare) =================
+  function tilt(el, max = 8, lift = -6) {
+    if (reduce || !fine) return;
+    el.addEventListener('pointermove', e => {
+      const r = el.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+      el.style.transition = 'transform .12s ease-out, box-shadow .25s, border-color .25s';
+      el.style.transform = `perspective(900px) rotateX(${(.5 - py) * max}deg) rotateY(${(px - .5) * max}deg) translateY(${lift}px) scale(1.015)`;
+      el.style.setProperty('--mx', px * 100 + '%');
+      el.style.setProperty('--my', py * 100 + '%');
+    });
+    el.addEventListener('pointerleave', () => {
+      el.style.transition = 'transform .5s ease, box-shadow .25s, border-color .25s';
+      el.style.transform = '';
+    });
+  }
+  document.querySelectorAll('.card').forEach(c => tilt(c, 6, -4));
 
+  // ================= Hero: mouse parallax + photo slideshow =================
+  const hero = $('home');
+  const layers = [...hero.querySelectorAll('[data-depth]')];
+  let htx = 0, hty = 0, hcx = 0, hcy = 0, hraf = 0;
+  function heroLoop() {
+    if (hraf) return;
+    const step = () => {
+      hcx += (htx - hcx) * .08; hcy += (hty - hcy) * .08;
+      layers.forEach(l => { const d = +l.dataset.depth; l.style.transform = `translate3d(${hcx * d}px, ${hcy * d}px, 0)`; });
+      if (Math.abs(htx - hcx) > .001 || Math.abs(hty - hcy) > .001) hraf = requestAnimationFrame(step); else hraf = 0;
+    };
+    hraf = requestAnimationFrame(step);
+  }
+  if (!reduce) {
+    hero.addEventListener('pointermove', e => {
+      const r = hero.getBoundingClientRect();
+      htx = (e.clientX - r.left) / r.width - .5; hty = (e.clientY - r.top) / r.height - .5; heroLoop();
+    });
+    hero.addEventListener('pointerleave', () => { htx = hty = 0; heroLoop(); });
+  }
+  function buildHeroSlides() {
+    const srcs = [];
+    for (let round = 0; round < 2; round++) CATEGORIES.forEach(c => {
+      const imgs = (photosByCat[c.key] || []).filter(i => i.type === 'image');
+      if (imgs[round]) srcs.push(imgs[round].src);
+    });
+    if (!srcs.length) return;
+    const box = $('heroSlides');
+    srcs.forEach(src => { const d = document.createElement('div'); d.className = 'hero-slide'; d.style.backgroundImage = `url('${src}')`; box.appendChild(d); });
+    const slides = [...box.children]; let n = 0;
+    const next = () => { slides.forEach((s, i) => s.classList.toggle('on', i === n)); n = (n + 1) % slides.length; };
+    next();
+    if (slides.length > 1) setInterval(next, 5500);
+  }
+
+  // ================= Album cards =================
+  const catsEl = $('cats');
+  const photosByCat = {};
+  function countText(list) {
+    const ni = list.filter(i => i.type === 'image').length, nv = list.length - ni, parts = [];
+    if (ni) parts.push(ni + (ni === 1 ? ' photo' : ' photos'));
+    if (nv) parts.push(nv + (nv === 1 ? ' video' : ' videos'));
+    return parts.join(' · ');
+  }
   async function buildCats() {
     const lists = await Promise.all(CATEGORIES.map(loadFolder));
     catsEl.innerHTML = '';
@@ -351,80 +481,173 @@
       const list = lists[i];
       photosByCat[cat.key] = list;
       const btn = document.createElement('button');
-      btn.className = 'cat';
-      btn.type = 'button';
-      const cover = list.length ? `style="background-image:url('${list[0]}')"` : '';
-      btn.innerHTML = `<div class="cat-wrap"><div class="cat-img" ${cover}>${list.length ? '' : 'Photos coming soon'}</div></div>
-        <div class="cat-info"><h3>${cat.title}</h3><span>${list.length ? list.length + (list.length === 1 ? ' photo' : ' photos') : ''}</span></div>`;
+      btn.className = 'cat'; btn.type = 'button';
+      const cover = list.find(x => x.type === 'image') || list[0];
+      let inner = 'Photos coming soon', style = '';
+      if (cover && cover.type === 'image') { style = `style="background-image:url('${cover.src}')"`; inner = ''; }
+      else if (cover) inner = `<video src="${cover.src}#t=0.1" muted playsinline preload="metadata"></video>`;
+      btn.innerHTML = `<div class="cat-wrap"><div class="cat-img" ${style}>${inner}</div></div>
+        <div class="cat-info"><h3>${cat.title}</h3><span>${countText(list)}</span></div>`;
       btn.onclick = () => openGallery(cat);
+      tilt(btn, 9, -6);
       catsEl.appendChild(btn);
     });
+    buildHeroSlides();
   }
   buildCats();
 
-  // ===== Gallery =====
-  const gallery = document.getElementById('gallery');
-  const galGrid = document.getElementById('galGrid');
-  let current = [];
-
+  // ================= Album view =================
+  const gallery = $('gallery'), galGrid = $('galGrid');
+  let current = [], currentTitle = '';
   function openGallery(cat) {
-    current = photosByCat[cat.key] || [];
-    document.getElementById('galTitle').textContent = cat.title;
-    document.getElementById('galCount').textContent = current.length ? current.length + ' photos' : '';
+    current = photosByCat[cat.key] || []; currentTitle = cat.title;
+    $('galTitle').textContent = cat.title;
+    $('galCount').textContent = countText(current);
+    $('galShow').style.display = current.length ? '' : 'none';
     galGrid.innerHTML = '';
-    if (!current.length) {
-      galGrid.innerHTML = '<p class="empty">No photos here yet. Please check back soon.</p>';
-    }
-    current.forEach((src, i) => {
-      const img = document.createElement('img');
-      img.src = src; img.loading = 'lazy'; img.alt = cat.title + ' photography by MK Photography';
-      img.onclick = () => openLightbox(i);
-      galGrid.appendChild(img);
+    if (!current.length) galGrid.innerHTML = '<p class="empty">No photos here yet. Please check back soon.</p>';
+    current.forEach((it, i) => {
+      const d = document.createElement('div'); d.className = 'gi';
+      if (it.type === 'video') {
+        d.innerHTML = `<video src="${it.src}#t=0.1" muted playsinline preload="metadata"></video><span class="play">▶</span>`;
+        const v = d.querySelector('video');
+        d.addEventListener('mouseenter', () => { if (fine) v.play().catch(() => {}); });
+        d.addEventListener('mouseleave', () => { v.pause(); v.currentTime = 0.1; });
+      } else {
+        d.innerHTML = `<img src="${it.src}" loading="lazy" alt="${cat.title} photography by MK Photography">`;
+      }
+      d.onclick = () => openShow(i, false);
+      tilt(d, 5, -3);
+      galGrid.appendChild(d);
     });
-    gallery.classList.add('open');
-    gallery.scrollTop = 0;
+    gallery.classList.add('open'); gallery.scrollTop = 0;
     document.body.style.overflow = 'hidden';
   }
-  function closeGallery() {
-    gallery.classList.remove('open');
-    document.body.style.overflow = '';
-  }
-  document.getElementById('galBack').onclick = closeGallery;
+  function closeGallery() { gallery.classList.remove('open'); document.body.style.overflow = ''; }
+  $('galBack').onclick = closeGallery;
+  $('galShow').onclick = () => openShow(0, true);
 
-  // ===== Lightbox =====
-  const lb = document.getElementById('lightbox');
-  const lbImg = document.getElementById('lbImg');
-  let idx = 0;
-  function showLb() {
-    lbImg.src = current[idx];
-    document.getElementById('lbCount').textContent = (idx + 1) + ' / ' + current.length;
+  // ================= Slideshow (photos + videos, mouse-move 3D) =================
+  const show = $('show'), stage = $('showStage'), bar = $('showBar');
+  let sItems = [], sIdx = 0, sPlaying = false, cur = null, timer = 0, remaining = 0, startedAt = 0, enterN = 0, muted = false, idleT = 0;
+
+  function setPlayBtn() { $('showPlay').textContent = sPlaying ? '❚❚' : '▶'; }
+  function setMuteBtn() { $('showMute').textContent = muted ? '🔇' : '🔊'; }
+  function schedule(ms) { clearTimeout(timer); startedAt = performance.now(); remaining = ms; timer = setTimeout(() => goTo(sIdx + 1, 1), ms); }
+
+  function render() {
+    const it = sItems[sIdx];
+    clearTimeout(timer);
+    const old = cur;
+    if (old) { old.el.classList.add('leave'); if (old.vid) old.vid.pause(); setTimeout(() => old.el.remove(), 900); }
+    const el = document.createElement('div');
+    el.className = 'slide in-' + 'abc'[enterN++ % 3] + (it.type === 'video' ? ' is-video' : '');
+    el.style.setProperty('--dur', (SLIDE_MS + 1500) + 'ms');
+    const bg = it.type === 'image' ? `<div class="slide-bg" style="background-image:url('${it.src}')"></div>` : '<div class="slide-bg dark"></div>';
+    const media = it.type === 'image' ? `<img src="${it.src}" alt="">` : `<video src="${it.src}" playsinline></video>`;
+    el.innerHTML = `${bg}<div class="slide-fg"><div class="kb">${media}</div></div>`;
+    stage.appendChild(el);
+    cur = { el, vid: el.querySelector('video') };
+    $('showCount').textContent = (sIdx + 1) + ' / ' + sItems.length;
+    bar.style.animation = 'none'; bar.style.width = '0'; void bar.offsetWidth;
+    if (it.type === 'image') {
+      $('showMute').style.display = 'none';
+      bar.style.width = ''; bar.style.animation = `bar ${SLIDE_MS}ms linear forwards`;
+      bar.style.animationPlayState = sPlaying ? 'running' : 'paused';
+      remaining = SLIDE_MS;
+      if (sPlaying) schedule(SLIDE_MS);
+    } else {
+      $('showMute').style.display = ''; setMuteBtn();
+      const v = cur.vid; v.muted = muted;
+      v.play().catch(() => { v.muted = true; muted = true; setMuteBtn(); v.play().catch(() => {}); });
+      v.ontimeupdate = () => { bar.style.width = (v.currentTime / (v.duration || 1) * 100) + '%'; };
+      v.onended = () => { if (sPlaying) goTo(sIdx + 1, 1); };
+      v.onclick = togglePlay;
+    }
+    const nx = sItems[(sIdx + 1) % sItems.length];
+    if (nx && nx.type === 'image') new Image().src = nx.src;
   }
-  function openLightbox(i) { idx = i; showLb(); lb.classList.add('open'); }
-  function step(d) { idx = (idx + d + current.length) % current.length; showLb(); }
-  document.getElementById('lbClose').onclick = () => lb.classList.remove('open');
-  document.getElementById('lbPrev').onclick = e => { e.stopPropagation(); step(-1); };
-  document.getElementById('lbNext').onclick = e => { e.stopPropagation(); step(1); };
-  lb.onclick = e => { if (e.target === lb) lb.classList.remove('open'); };
+  function goTo(i) { sIdx = (i + sItems.length) % sItems.length; render(); }
+  function pauseShow() {
+    sPlaying = false; clearTimeout(timer);
+    remaining = Math.max(0, remaining - (performance.now() - startedAt));
+    bar.style.animationPlayState = 'paused';
+    if (cur && cur.vid) cur.vid.pause();
+    setPlayBtn();
+  }
+  function resumeShow() {
+    sPlaying = true; setPlayBtn();
+    if (cur && cur.vid) cur.vid.play().catch(() => {});
+    else { bar.style.animationPlayState = 'running'; schedule(remaining || SLIDE_MS); }
+  }
+  function togglePlay() { sPlaying ? pauseShow() : resumeShow(); }
+
+  // mouse-move 3D depth
+  let mx = 0, my = 0, cx = 0, cy = 0, loopId = 0;
+  function startLoop() {
+    cancelAnimationFrame(loopId);
+    const f = () => {
+      cx += (mx - cx) * .07; cy += (my - cy) * .07;
+      const st = show.style;
+      st.setProperty('--ry', (cx * 16) + 'deg'); st.setProperty('--rx', (-cy * 12) + 'deg');
+      st.setProperty('--tx', (cx * -30) + 'px'); st.setProperty('--ty', (cy * -22) + 'px');
+      st.setProperty('--bx', (cx * 50) + 'px');  st.setProperty('--by', (cy * 36) + 'px');
+      st.setProperty('--gx', ((cx + .5) * 100) + '%'); st.setProperty('--gy', ((cy + .5) * 100) + '%');
+      loopId = requestAnimationFrame(f);
+    };
+    loopId = requestAnimationFrame(f);
+  }
+  function wakeUI() { show.classList.remove('idle'); clearTimeout(idleT); idleT = setTimeout(() => show.classList.add('idle'), 2800); }
+  show.addEventListener('pointermove', e => { if (!reduce) { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; } wakeUI(); });
+
+  function openShow(i, auto) {
+    if (!current.length) return;
+    sItems = current; $('showTitle').textContent = currentTitle;
+    show.classList.add('open'); show.setAttribute('aria-hidden', 'false');
+    sPlaying = auto; setPlayBtn(); cur = null; stage.innerHTML = '';
+    mx = my = cx = cy = 0; startLoop(); wakeUI();
+    sIdx = i; render();
+  }
+  function closeShow() {
+    clearTimeout(timer); cancelAnimationFrame(loopId);
+    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
+    show.classList.remove('open'); show.setAttribute('aria-hidden', 'true');
+    stage.innerHTML = ''; cur = null;
+  }
+  function toggleFs() {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else if (show.requestFullscreen) show.requestFullscreen().catch(() => {});
+  }
+  $('showClose').onclick = closeShow;
+  $('showPrev').onclick = () => goTo(sIdx - 1);
+  $('showNext').onclick = () => goTo(sIdx + 1);
+  $('showPlay').onclick = togglePlay;
+  $('showFs').onclick = toggleFs;
+  $('showMute').onclick = () => { muted = !muted; if (cur && cur.vid) cur.vid.muted = muted; setMuteBtn(); };
+
   document.addEventListener('keydown', e => {
-    if (lb.classList.contains('open')) {
-      if (e.key === 'Escape') lb.classList.remove('open');
-      if (e.key === 'ArrowLeft') step(-1);
-      if (e.key === 'ArrowRight') step(1);
+    if (show.classList.contains('open')) {
+      if (e.key === 'Escape') closeShow();
+      else if (e.key === 'ArrowRight') goTo(sIdx + 1);
+      else if (e.key === 'ArrowLeft') goTo(sIdx - 1);
+      else if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+      else if (e.key === 'f' || e.key === 'F') toggleFs();
+      else if (e.key === 'm' || e.key === 'M') $('showMute').click();
+      wakeUI();
     } else if (gallery.classList.contains('open') && e.key === 'Escape') closeGallery();
   });
-  // Swipe on phones
-  let tx = 0;
-  lb.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
-  lb.addEventListener('touchend', e => {
-    const dx = e.changedTouches[0].clientX - tx;
-    if (Math.abs(dx) > 50) step(dx < 0 ? 1 : -1);
+  let tx0 = 0;
+  show.addEventListener('touchstart', e => { tx0 = e.touches[0].clientX; wakeUI(); }, { passive: true });
+  show.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - tx0;
+    if (Math.abs(dx) > 50) goTo(sIdx + (dx < 0 ? 1 : -1));
   });
 
-  // ===== Mobile menu & year =====
-  const menu = document.getElementById('menu');
-  document.getElementById('menuBtn').onclick = () => menu.classList.toggle('open');
+  // ================= Mobile menu & year =================
+  const menu = $('menu');
+  $('menuBtn').onclick = () => menu.classList.toggle('open');
   menu.querySelectorAll('a').forEach(a => a.onclick = () => menu.classList.remove('open'));
-  document.getElementById('year').textContent = new Date().getFullYear();
+  $('year').textContent = new Date().getFullYear();
 </script>
 </body>
 </html>
