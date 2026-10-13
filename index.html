@@ -389,46 +389,40 @@
     return FALLBACK_REPO;
   }
 
-  // Files placed directly in assets/ also work if their name starts with the album name,
-  // e.g. assets/wedding-1.JPG, assets/pre-wedding-2.jpg, assets/events-3.mp4
-  let rootP = null;
-  function rootNames() {
-    if (!rootP) {
-      const { owner, repo } = repoInfo();
-      rootP = fetch(`https://api.github.com/repos/${owner}/${repo}/contents/assets`)
-        .then(r => r.ok ? r.json() : [])
-        .then(d => d.filter(f => f.type === 'file').map(f => f.name))
-        .catch(() => []);
-    }
-    return rootP;
-  }
+  // ONE request lists every file in the repo (keeps us far below GitHub's API limit).
+  // Album photos can live in a folder (assets/wedding/x.jpg) OR directly in assets/ with the album
+  // name at the start of the file name (assets/wedding-1.JPG, assets/pre-wedding-2.jpg, assets/events-3.mp4).
   const isMedia = n => IMG_RE.test(n) || VID_RE.test(n);
-
-  async function loadFolder(cat) {
+  async function loadAll() {
     const { owner, repo } = repoInfo();
-    const url = `https://api.github.com/repos/${owner}/${repo}/contents/${cat.folder}`;
-    const ck = 'mk3_' + url;
-    try {
-      const c = JSON.parse(sessionStorage.getItem(ck) || 'null');
-      if (c && Date.now() - c.t < 120000) return c.list;
-    } catch (e) {}
-    let entries = [];
-    try {
-      const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        entries = data.filter(f => f.type === 'file' && isMedia(f.name)).map(f => ({ name: f.name, dir: cat.folder }));
+    const ck = 'mk4_paths';
+    let cached = null, paths = null;
+    try { cached = JSON.parse(localStorage.getItem(ck) || 'null'); } catch (e) {}
+    if (cached && Date.now() - cached.t < 300000) paths = cached.paths;
+    if (!paths) {
+      for (const br of ['main', 'master']) {
+        try {
+          const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/${br}?recursive=1`);
+          if (res.ok) {
+            const d = await res.json();
+            paths = d.tree.filter(t => t.type === 'blob' && t.path.startsWith('assets/') && isMedia(t.path)).map(t => t.path);
+            try { localStorage.setItem(ck, JSON.stringify({ t: Date.now(), paths })); } catch (e) {}
+            break;
+          }
+        } catch (e) {}
       }
-    } catch (e) {}
-    const pref = cat.key + '-';
-    (await rootNames()).forEach(n => {
-      if (n.toLowerCase().startsWith(pref) && isMedia(n)) entries.push({ name: n, dir: 'assets' });
+    }
+    if (!paths) paths = cached ? cached.paths : [];   // rate-limited? fall back to the last known list
+    return CATEGORIES.map(cat => {
+      let entries = [];
+      paths.forEach(pth => {
+        const i = pth.lastIndexOf('/'), dir = pth.slice(0, i), name = pth.slice(i + 1);
+        if (dir === cat.folder || (dir === 'assets' && name.toLowerCase().startsWith(cat.key + '-'))) entries.push({ dir, name });
+      });
+      if (!entries.length) entries = (MANUAL[cat.key] || []).map(n => ({ dir: cat.folder, name: n }));
+      entries.sort((x, y) => x.name.localeCompare(y.name, undefined, { numeric: true }));
+      return entries.map(e => ({ src: `${e.dir}/${enc(e.name)}`, type: VID_RE.test(e.name) ? 'video' : 'image' }));
     });
-    if (!entries.length) entries = (MANUAL[cat.key] || []).map(n => ({ name: n, dir: cat.folder }));
-    entries.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
-    const list = entries.map(e => ({ src: `${e.dir}/${enc(e.name)}`, type: VID_RE.test(e.name) ? 'video' : 'image' }));
-    try { sessionStorage.setItem(ck, JSON.stringify({ t: Date.now(), list })); } catch (e) {}
-    return list;
   }
 
   // ================= Mouse tilt (3D + glare) =================
@@ -494,7 +488,7 @@
     return parts.join(' · ');
   }
   async function buildCats() {
-    const lists = await Promise.all(CATEGORIES.map(loadFolder));
+    const lists = await loadAll();
     catsEl.innerHTML = '';
     CATEGORIES.forEach((cat, i) => {
       const list = lists[i];
