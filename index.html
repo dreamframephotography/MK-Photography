@@ -389,25 +389,44 @@
     return FALLBACK_REPO;
   }
 
+  // Files placed directly in assets/ also work if their name starts with the album name,
+  // e.g. assets/wedding-1.JPG, assets/pre-wedding-2.jpg, assets/events-3.mp4
+  let rootP = null;
+  function rootNames() {
+    if (!rootP) {
+      const { owner, repo } = repoInfo();
+      rootP = fetch(`https://api.github.com/repos/${owner}/${repo}/contents/assets`)
+        .then(r => r.ok ? r.json() : [])
+        .then(d => d.filter(f => f.type === 'file').map(f => f.name))
+        .catch(() => []);
+    }
+    return rootP;
+  }
+  const isMedia = n => IMG_RE.test(n) || VID_RE.test(n);
+
   async function loadFolder(cat) {
     const { owner, repo } = repoInfo();
     const url = `https://api.github.com/repos/${owner}/${repo}/contents/${cat.folder}`;
-    const ck = 'mk2_' + url;
+    const ck = 'mk3_' + url;
     try {
       const c = JSON.parse(sessionStorage.getItem(ck) || 'null');
       if (c && Date.now() - c.t < 120000) return c.list;
     } catch (e) {}
-    let names = [];
+    let entries = [];
     try {
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
-        names = data.filter(f => f.type === 'file' && (IMG_RE.test(f.name) || VID_RE.test(f.name))).map(f => f.name);
+        entries = data.filter(f => f.type === 'file' && isMedia(f.name)).map(f => ({ name: f.name, dir: cat.folder }));
       }
     } catch (e) {}
-    if (!names.length) names = MANUAL[cat.key] || [];
-    names.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
-    const list = names.map(n => ({ src: `${cat.folder}/${enc(n)}`, type: VID_RE.test(n) ? 'video' : 'image' }));
+    const pref = cat.key + '-';
+    (await rootNames()).forEach(n => {
+      if (n.toLowerCase().startsWith(pref) && isMedia(n)) entries.push({ name: n, dir: 'assets' });
+    });
+    if (!entries.length) entries = (MANUAL[cat.key] || []).map(n => ({ name: n, dir: cat.folder }));
+    entries.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+    const list = entries.map(e => ({ src: `${e.dir}/${enc(e.name)}`, type: VID_RE.test(e.name) ? 'video' : 'image' }));
     try { sessionStorage.setItem(ck, JSON.stringify({ t: Date.now(), list })); } catch (e) {}
     return list;
   }
