@@ -376,7 +376,7 @@
   const MANUAL = {};
   // Exact cover file (inside assets/) for an album. Used even if auto-detection finds nothing.
   const COVERS = { wedding: 'wedding Cover.jpg' };
-  const BUILD = 'v4-cover';
+  const BUILD = 'v5-center';
   const SLIDE_MS = 5000;
 
   const IMG_RE = /\.(jpe?g|png|webp|avif|gif)$/i;
@@ -500,6 +500,36 @@
     if (slides.length > 1) heroTimer = setInterval(next, 5500);
   }
 
+  // ================= Smart centering for album covers =================
+  // When a cover has to be cropped to fit the card, shift the crop so the main subject
+  // (the part with the most detail) sits in the middle. Override per album if you like:
+  // const COVER_POS = { wedding: '40% 30%' };
+  const CARD_AR = 4 / 3;
+  const COVER_POS = {};
+  function focalPoint(img) {
+    const W = 48, H = Math.max(8, Math.round(48 * img.naturalHeight / img.naturalWidth));
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    const g2 = cv.getContext('2d', { willReadFrequently: true }); g2.drawImage(img, 0, 0, W, H);
+    const d = g2.getImageData(0, 0, W, H).data;
+    const L = (x, y) => { const i = (y * W + x) * 4; return .299 * d[i] + .587 * d[i + 1] + .114 * d[i + 2]; };
+    let sx = 0, sy = 0, sw = 0;
+    for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+      const g = Math.abs(L(x + 1, y) - L(x - 1, y)) + Math.abs(L(x, y + 1) - L(x, y - 1));
+      const nx = x / W - .5, ny = y / H - .5;
+      const w = g * Math.exp(-(nx * nx + ny * ny) / (2 * .35 * .35));   // gentle pull toward the middle
+      sx += w * x; sy += w * y; sw += w;
+    }
+    return sw ? { fx: sx / sw / W, fy: sy / sw / H } : { fx: .5, fy: .5 };
+  }
+  function cropPos(img, ar) {
+    const { fx, fy } = focalPoint(img);
+    const iar = img.naturalWidth / img.naturalHeight, clamp = v => Math.min(100, Math.max(0, v));
+    let px = 50, py = 50;
+    if (iar > ar) { const vf = ar / iar; px = clamp((fx - vf / 2) / (1 - vf) * 100); }
+    else if (iar < ar) { const vf = iar / ar; py = clamp((fy - vf / 2) / (1 - vf) * 100); }
+    return `${px.toFixed(1)}% ${py.toFixed(1)}%`;
+  }
+
   // ================= Album cards =================
   const catsEl = $('cats');
   const photosByCat = {};
@@ -523,10 +553,14 @@
       btn.innerHTML = `<div class="cat-wrap"><div class="cat-img" ${style}>${inner}</div></div>
         <div class="cat-info"><h3>${cat.title}</h3><span>${countText(list)}</span></div>`;
       btn.onclick = () => openGallery(cat);
-      if (list.cover) {   // if the cover file can't be loaded, fall back to the first photo
-        const probe = new Image();
-        probe.onerror = () => { const alt = list.find(x => x.type === 'image'); if (alt) btn.querySelector('.cat-img').style.backgroundImage = `url('${alt.src}')`; };
-        probe.src = list.cover;
+      if (cover && cover.type === 'image') {
+        const el = btn.querySelector('.cat-img'), probe = new Image();
+        probe.onload = () => { try { el.style.backgroundPosition = COVER_POS[cat.key] || cropPos(probe, CARD_AR); } catch (e) {} };
+        if (list.cover) probe.onerror = () => {   // cover file can't be loaded: fall back to the first photo
+          const alt = list.find(x => x.type === 'image');
+          if (alt) { el.style.backgroundImage = `url('${alt.src}')`; el.style.backgroundPosition = 'center'; }
+        };
+        probe.src = cover.src;
       }
       tilt(btn, 9, -6);
       catsEl.appendChild(btn);
