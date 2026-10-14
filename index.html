@@ -398,26 +398,24 @@
   // Album photos can live in a folder (assets/wedding/x.jpg) OR directly in assets/ with the album
   // name at the start of the file name (assets/wedding-1.JPG, assets/pre-wedding-2.jpg, assets/events-3.mp4).
   const isMedia = n => IMG_RE.test(n) || VID_RE.test(n);
-  async function loadAll() {
+  const CACHE_KEY = 'mk4_paths';
+  function readCache() { try { return JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); } catch (e) { return null; } }
+  async function fetchPaths() {
     const { owner, repo } = repoInfo();
-    const ck = 'mk4_paths';
-    let cached = null, paths = null;
-    try { cached = JSON.parse(localStorage.getItem(ck) || 'null'); } catch (e) {}
-    if (cached && Date.now() - cached.t < 300000) paths = cached.paths;
-    if (!paths) {
-      for (const br of ['main', 'master']) {
-        try {
-          const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/${br}?recursive=1`);
-          if (res.ok) {
-            const d = await res.json();
-            paths = d.tree.filter(t => t.type === 'blob' && t.path.startsWith('assets/') && isMedia(t.path)).map(t => t.path);
-            try { localStorage.setItem(ck, JSON.stringify({ t: Date.now(), paths })); } catch (e) {}
-            break;
-          }
-        } catch (e) {}
-      }
+    for (const br of ['main', 'master']) {
+      try {
+        const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/${br}?recursive=1`, { cache: 'no-store' });
+        if (res.ok) {
+          const d = await res.json();
+          const paths = d.tree.filter(t => t.type === 'blob' && t.path.startsWith('assets/') && isMedia(t.path)).map(t => t.path);
+          try { localStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), paths })); } catch (e) {}
+          return paths;
+        }
+      } catch (e) {}
     }
-    if (!paths) paths = cached ? cached.paths : [];   // rate-limited? fall back to the last known list
+    return null;
+  }
+  function listsFromPaths(paths) {
     // A file called "<album> cover" (e.g. "wedding Cover.jpg", "wedding-cover.jpg", or "cover.jpg" inside the
     // album folder) becomes the album's cover picture.
     const norm = n => n.toLowerCase().replace(/\.[^.]+$/, '').replace(/[\s_-]+/g, '');
@@ -480,7 +478,9 @@
     });
     hero.addEventListener('pointerleave', () => { htx = hty = 0; heroLoop(); });
   }
+  let heroTimer = 0;
   function buildHeroSlides() {
+    clearInterval(heroTimer); $('heroSlides').innerHTML = '';
     const srcs = [];
     for (let round = 0; round < 2; round++) CATEGORIES.forEach(c => {
       const lst = photosByCat[c.key] || [];
@@ -493,7 +493,7 @@
     const slides = [...box.children]; let n = 0;
     const next = () => { slides.forEach((s, i) => s.classList.toggle('on', i === n)); n = (n + 1) % slides.length; };
     next();
-    if (slides.length > 1) setInterval(next, 5500);
+    if (slides.length > 1) heroTimer = setInterval(next, 5500);
   }
 
   // ================= Album cards =================
@@ -505,8 +505,7 @@
     if (nv) parts.push(nv + (nv === 1 ? ' video' : ' videos'));
     return parts.join(' · ');
   }
-  async function buildCats() {
-    const lists = await loadAll();
+  function renderCats(lists) {
     catsEl.innerHTML = '';
     CATEGORIES.forEach((cat, i) => {
       const list = lists[i];
@@ -524,6 +523,15 @@
       catsEl.appendChild(btn);
     });
     buildHeroSlides();
+  }
+  // Show the last known list instantly, then quietly fetch the fresh list and update if anything changed.
+  async function buildCats() {
+    const c = readCache();
+    if (c) renderCats(listsFromPaths(c.paths));
+    if (c && Date.now() - c.t < 20000) return;          // refreshed a moment ago
+    const paths = await fetchPaths();
+    if (paths) { if (!c || JSON.stringify(paths) !== JSON.stringify(c.paths)) renderCats(listsFromPaths(paths)); }
+    else if (!c) renderCats(listsFromPaths([]));
   }
   buildCats();
 
