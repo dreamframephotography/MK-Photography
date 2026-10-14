@@ -374,6 +374,9 @@
   const FALLBACK_REPO = { owner: 'dreamframephotography', repo: 'MK-Photography' };
   // Backup list (only used if GitHub's folder listing is unavailable). Example: wedding: ['a.jpg','b.mp4']
   const MANUAL = {};
+  // Exact cover file (inside assets/) for an album. Used even if auto-detection finds nothing.
+  const COVERS = { wedding: 'wedding Cover.jpg' };
+  const BUILD = 'v4-cover';
   const SLIDE_MS = 5000;
 
   const IMG_RE = /\.(jpe?g|png|webp|avif|gif)$/i;
@@ -432,6 +435,7 @@
         }
         if (inFolder || (lower.startsWith(cat.key) && /^[-_ ]/.test(lower.slice(cat.key.length)))) entries.push({ dir, name });
       });
+      if (!cover && COVERS[cat.key]) cover = 'assets/' + enc(COVERS[cat.key]);
       if (!entries.length) entries = (MANUAL[cat.key] || []).map(n => ({ dir: cat.folder, name: n }));
       entries.sort((x, y) => x.name.localeCompare(y.name, undefined, { numeric: true }));
       const out = entries.map(e => ({ src: `${e.dir}/${enc(e.name)}`, type: VID_RE.test(e.name) ? 'video' : 'image' }));
@@ -519,18 +523,33 @@
       btn.innerHTML = `<div class="cat-wrap"><div class="cat-img" ${style}>${inner}</div></div>
         <div class="cat-info"><h3>${cat.title}</h3><span>${countText(list)}</span></div>`;
       btn.onclick = () => openGallery(cat);
+      if (list.cover) {   // if the cover file can't be loaded, fall back to the first photo
+        const probe = new Image();
+        probe.onerror = () => { const alt = list.find(x => x.type === 'image'); if (alt) btn.querySelector('.cat-img').style.backgroundImage = `url('${alt.src}')`; };
+        probe.src = list.cover;
+      }
       tilt(btn, 9, -6);
       catsEl.appendChild(btn);
     });
     buildHeroSlides();
+    showDebug();
+  }
+  // Open the site with ?debug at the end of the address to see what was found.
+  let lastCount = 0;
+  function showDebug() {
+    if (!/[?&]debug/.test(location.search)) return;
+    let d = $('dbg');
+    if (!d) { d = document.createElement('pre'); d.id = 'dbg'; d.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:999;background:rgba(0,0,0,.82);color:#fff;font:12px/1.5 monospace;padding:10px 12px;border-radius:8px;max-width:92vw;white-space:pre-wrap'; document.body.appendChild(d); }
+    const { owner, repo } = repoInfo();
+    d.textContent = `build ${BUILD}\nrepo ${owner}/${repo}\nmedia files found in assets: ${lastCount}\n` + CATEGORIES.map(c => { const l = photosByCat[c.key] || []; return `${c.title}: ${l.length} items, cover = ${l.cover ? decodeURIComponent(l.cover) : 'none'}`; }).join('\n');
   }
   // Show the last known list instantly, then quietly fetch the fresh list and update if anything changed.
   async function buildCats() {
     const c = readCache();
-    if (c) renderCats(listsFromPaths(c.paths));
+    if (c) { lastCount = c.paths.length; renderCats(listsFromPaths(c.paths)); }
     if (c && Date.now() - c.t < 20000) return;          // refreshed a moment ago
     const paths = await fetchPaths();
-    if (paths) { if (!c || JSON.stringify(paths) !== JSON.stringify(c.paths)) renderCats(listsFromPaths(paths)); }
+    if (paths) { lastCount = paths.length; if (!c || JSON.stringify(paths) !== JSON.stringify(c.paths)) renderCats(listsFromPaths(paths)); else showDebug(); }
     else if (!c) renderCats(listsFromPaths([]));
   }
   buildCats();
