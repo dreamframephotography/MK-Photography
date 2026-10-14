@@ -418,15 +418,27 @@
       }
     }
     if (!paths) paths = cached ? cached.paths : [];   // rate-limited? fall back to the last known list
+    // A file called "<album> cover" (e.g. "wedding Cover.jpg", "wedding-cover.jpg", or "cover.jpg" inside the
+    // album folder) becomes the album's cover picture.
+    const norm = n => n.toLowerCase().replace(/\.[^.]+$/, '').replace(/[\s_-]+/g, '');
     return CATEGORIES.map(cat => {
-      let entries = [];
+      const kn = norm(cat.key); let entries = [], cover = null;
       paths.forEach(pth => {
-        const i = pth.lastIndexOf('/'), dir = pth.slice(0, i), name = pth.slice(i + 1);
-        if (dir === cat.folder || (dir === 'assets' && name.toLowerCase().startsWith(cat.key + '-'))) entries.push({ dir, name });
+        const i = pth.lastIndexOf('/'), dir = pth.slice(0, i), name = pth.slice(i + 1), lower = name.toLowerCase();
+        const inFolder = dir === cat.folder, inRoot = dir === 'assets';
+        if (!inFolder && !inRoot) return;
+        const nn = norm(name);
+        if (nn === kn + 'cover' || (inFolder && nn === 'cover')) {
+          if (IMG_RE.test(name) && !cover) cover = `${dir}/${enc(name)}`;
+          return;
+        }
+        if (inFolder || (lower.startsWith(cat.key) && /^[-_ ]/.test(lower.slice(cat.key.length)))) entries.push({ dir, name });
       });
       if (!entries.length) entries = (MANUAL[cat.key] || []).map(n => ({ dir: cat.folder, name: n }));
       entries.sort((x, y) => x.name.localeCompare(y.name, undefined, { numeric: true }));
-      return entries.map(e => ({ src: `${e.dir}/${enc(e.name)}`, type: VID_RE.test(e.name) ? 'video' : 'image' }));
+      const out = entries.map(e => ({ src: `${e.dir}/${enc(e.name)}`, type: VID_RE.test(e.name) ? 'video' : 'image' }));
+      out.cover = cover;
+      return out;
     });
   }
 
@@ -471,8 +483,9 @@
   function buildHeroSlides() {
     const srcs = [];
     for (let round = 0; round < 2; round++) CATEGORIES.forEach(c => {
-      const imgs = (photosByCat[c.key] || []).filter(i => i.type === 'image');
-      if (imgs[round]) srcs.push(imgs[round].src);
+      const lst = photosByCat[c.key] || [];
+      const pool = (lst.cover ? [{ src: lst.cover }] : []).concat(lst.filter(i => i.type === 'image'));
+      if (pool[round]) srcs.push(pool[round].src);
     });
     if (!srcs.length) return;
     const box = $('heroSlides');
@@ -500,7 +513,7 @@
       photosByCat[cat.key] = list;
       const btn = document.createElement('button');
       btn.className = 'cat'; btn.type = 'button';
-      const cover = list.find(x => x.type === 'image') || list[0];
+      const cover = list.cover ? { src: list.cover, type: 'image' } : (list.find(x => x.type === 'image') || list[0]);
       let inner = 'Photos coming soon', style = '';
       if (cover && cover.type === 'image') { style = `style="background-image:url('${cover.src}')"`; inner = ''; }
       else if (cover) inner = `<video src="${cover.src}#t=0.1" muted playsinline preload="metadata"></video>`;
