@@ -376,7 +376,7 @@
   const MANUAL = {};
   // Exact cover file (inside assets/) for an album. Used even if auto-detection finds nothing.
   const COVERS = { wedding: 'wedding Cover.jpg' };
-  const BUILD = 'v8-gallery';
+  const BUILD = 'v9-hero';
   const SLIDE_MS = 5000;
 
   const IMG_RE = /\.(jpe?g|png|webp|avif|gif)$/i;
@@ -486,19 +486,35 @@
   let heroTimer = 0;
   function buildHeroSlides() {
     clearInterval(heroTimer); $('heroSlides').innerHTML = '';
-    const srcs = [];
-    for (let round = 0; round < 2; round++) CATEGORIES.forEach(c => {
-      const lst = photosByCat[c.key] || [];
-      const pool = (lst.cover ? [{ src: lst.cover }] : []).concat(lst.filter(i => i.type === 'image'));
-      if (pool[round]) srcs.push(pool[round].src);
+    // candidates: each album's cover first, then its photos
+    const cand = [];
+    CATEGORIES.forEach(c => { const l = photosByCat[c.key] || []; if (l.cover) cand.push(l.cover); });
+    for (let r = 0; r < 2; r++) CATEGORIES.forEach(c => { const im = (photosByCat[c.key] || []).filter(i => i.type === 'image')[r]; if (im) cand.push(im.src); });
+    const uniq = [...new Set(cand)].slice(0, 14);
+    if (!uniq.length) return;
+    const box = $('heroSlides'), ok = [], all = []; let pending = uniq.length;
+    const done = () => {
+      if (--pending) return;
+      // the hero is a wide banner: use only landscape photos so nobody gets cropped (couples stay together)
+      const use = (ok.length ? ok : all).slice(0, 6);
+      if (!use.length) return;
+      const ar = Math.max(1, innerWidth) / Math.max(1, innerHeight);
+      use.forEach(({ src, img }) => {
+        const d = document.createElement('div'); d.className = 'hero-slide'; d.style.backgroundImage = `url('${src}')`;
+        try { d.style.backgroundPosition = cropPos(img, ar); } catch (e) {}
+        box.appendChild(d);
+      });
+      const slides = [...box.children]; let n = 0;
+      const next = () => { slides.forEach((s, i) => s.classList.toggle('on', i === n)); n = (n + 1) % slides.length; };
+      next();
+      if (slides.length > 1) heroTimer = setInterval(next, 5500);
+    };
+    uniq.forEach(src => {
+      const img = new Image(); if (location.protocol !== 'file:') img.crossOrigin = 'anonymous';
+      img.onload = () => { const it = { src, img }; all.push(it); if (img.naturalWidth / img.naturalHeight >= 1.3) ok.push(it); done(); };
+      img.onerror = () => done();
+      img.src = src;
     });
-    if (!srcs.length) return;
-    const box = $('heroSlides');
-    srcs.forEach(src => { const d = document.createElement('div'); d.className = 'hero-slide'; d.style.backgroundImage = `url('${src}')`; box.appendChild(d); });
-    const slides = [...box.children]; let n = 0;
-    const next = () => { slides.forEach((s, i) => s.classList.toggle('on', i === n)); n = (n + 1) % slides.length; };
-    next();
-    if (slides.length > 1) heroTimer = setInterval(next, 5500);
   }
 
   // ================= Smart centering for album covers =================
@@ -527,7 +543,7 @@
     const iar = img.naturalWidth / img.naturalHeight, clamp = v => Math.min(100, Math.max(0, v));
     let px = 50, py = 50;
     if (iar > ar) { const vf = ar / iar; px = clamp((fx - vf / 2) / (1 - vf) * 100); }
-    else if (iar < ar) { const vf = iar / ar; py = Math.min(12, clamp((fy - vf / 2) / (1 - vf) * 100)); } // tall photos: keep the head in frame
+    else if (iar < ar) { const vf = iar / ar; py = clamp((fy - vf / 2) / (1 - vf) * 100); if (iar < 1) py = Math.min(12, py); } // tall photos: keep the head in frame
     return `${px.toFixed(1)}% ${py.toFixed(1)}%`;
   }
 
