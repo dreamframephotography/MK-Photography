@@ -376,7 +376,7 @@
   const MANUAL = {};
   // Exact cover file (inside assets/) for an album. Used even if auto-detection finds nothing.
   const COVERS = { wedding: 'wedding Cover.jpg' };
-  const BUILD = 'v6-portrait';
+  const BUILD = 'v7-head';
   const SLIDE_MS = 5000;
 
   const IMG_RE = /\.(jpe?g|png|webp|avif|gif)$/i;
@@ -527,7 +527,7 @@
     const iar = img.naturalWidth / img.naturalHeight, clamp = v => Math.min(100, Math.max(0, v));
     let px = 50, py = 50;
     if (iar > ar) { const vf = ar / iar; px = clamp((fx - vf / 2) / (1 - vf) * 100); }
-    else if (iar < ar) { const vf = iar / ar; py = clamp((fy - vf / 2) / (1 - vf) * 100); }
+    else if (iar < ar) { const vf = iar / ar; py = Math.min(12, clamp((fy - vf / 2) / (1 - vf) * 100)); } // tall photos: keep the head in frame
     return `${px.toFixed(1)}% ${py.toFixed(1)}%`;
   }
 
