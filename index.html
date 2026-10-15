@@ -131,16 +131,16 @@
   .cat:hover::after, .card:hover::after, .gi:hover::after { opacity: 1; }
 
   /* Gallery */
-  .gallery { position: fixed; inset: 0; background: var(--bg); z-index: 90; overflow-y: auto; display: none; }
+  .gallery { position: fixed; inset: 0; background: radial-gradient(ellipse at 50% 0%, #3a2f26 0%, #241d18 55%, #1a1511 100%); color: #f3e9d8; z-index: 90; overflow-y: auto; display: none; }
   .gallery.open { display: block; }
-  .gallery-head { position: sticky; top: 0; background: rgba(255,255,255,.94); backdrop-filter: blur(10px); border-bottom: 1px solid #6b5a4a26; display: flex; align-items: center; gap: 14px; padding: 14px 4%; z-index: 2; }
-  .gallery-head h3 { font-size: 1.5rem; }
-  .gallery-head span { color: var(--muted); font-size: .9rem; margin-left: auto; }
-  .back, .show-btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 8px 20px; border-radius: 999px; cursor: pointer; font-family: inherit; font-size: .9rem; }
-  .back:hover, .show-btn { background: var(--accent); color: #fff; }
+  .gallery-head { position: sticky; top: 0; background: rgba(26,21,17,.92); backdrop-filter: blur(10px); border-bottom: 1px solid #c9a96e55; display: flex; align-items: center; gap: 14px; padding: 14px 4%; z-index: 2; }
+  .gallery-head h3 { font-size: 1.5rem; color: #f3e9d8; }
+  .gallery-head span { color: #c9a96e; font-size: .9rem; margin-left: auto; }
+  .back, .show-btn { background: none; border: 1px solid #c9a96e; color: #e3c78f; padding: 8px 20px; border-radius: 999px; cursor: pointer; font-family: inherit; font-size: .9rem; }
+  .back:hover, .show-btn { background: #c9a96e; color: #241d18; }
   .show-btn:hover { filter: brightness(1.08); }
   .gallery-grid { column-width: 260px; column-gap: 14px; padding: 24px 4% 60px; max-width: 1280px; margin: 0 auto; }
-  .gi { position: relative; margin-bottom: 14px; border-radius: 8px; overflow: hidden; cursor: zoom-in; break-inside: avoid; background: #efe4d2; will-change: transform; }
+  .gi { position: relative; margin-bottom: 14px; border-radius: 8px; overflow: hidden; cursor: zoom-in; break-inside: avoid; background: #3a2f26; box-shadow: 0 6px 22px rgba(0,0,0,.35); }
   .gi img, .gi video { width: 100%; display: block; }
   .gi .play { position: absolute; right: 12px; bottom: 12px; width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,.92); color: #2b2622; display: flex; align-items: center; justify-content: center; font-size: .85rem; padding-left: 2px; z-index: 1; }
   .empty { text-align: center; color: var(--muted); padding: 80px 20px; column-span: all; }
@@ -376,7 +376,7 @@
   const MANUAL = {};
   // Exact cover file (inside assets/) for an album. Used even if auto-detection finds nothing.
   const COVERS = { wedding: 'wedding Cover.jpg' };
-  const BUILD = 'v7-head';
+  const BUILD = 'v8-gallery';
   const SLIDE_MS = 5000;
 
   const IMG_RE = /\.(jpe?g|png|webp|avif|gif)$/i;
