@@ -484,15 +484,17 @@
     });
     hero.addEventListener('pointerleave', () => { htx = hty = 0; heroLoop(); });
   }
-  // Hero = ONE still couple photo (no slideshow, no zoom). It prefers the Pre-Wedding cover, then the Wedding cover,
-  // then any wide (landscape) Pre-Wedding / Wedding photo. To force one, set HERO_IMAGE = 'my-photo.jpg' (file in assets/).
-  const HERO_IMAGE = '';
+  // Hero = ONE still couple photo (no slideshow, no zoom). It uses wedding-1 (HERO_IMAGE), then any wide Wedding / Pre-Wedding photo.
+  // To use another photo, set HERO_IMAGE = 'file-name' (with or without extension).
+  const HERO_IMAGE = 'wedding-1';
   function buildHeroSlides() {
     const box = $('heroSlides'); box.innerHTML = '';
     const cand = [];
-    if (HERO_IMAGE) cand.push('assets/' + enc(HERO_IMAGE));
-    ['pre-wedding', 'wedding'].forEach(k => { const l = photosByCat[k] || []; if (l.cover) cand.push(l.cover); });
-    ['pre-wedding', 'wedding'].forEach(k => (photosByCat[k] || []).filter(i => i.type === 'image').forEach(i => cand.push(i.src)));
+    // HERO_IMAGE is matched by name without extension (case-insensitive), e.g. 'wedding-1' finds wedding-1.JPG
+    const bare = x => decodeURIComponent(x.split('/').pop()).replace(/\.[^.]+$/, '').toLowerCase();
+    const all = []; CATEGORIES.forEach(c => (photosByCat[c.key] || []).filter(i => i.type === 'image').forEach(i => all.push(i.src)));
+    if (HERO_IMAGE) all.filter(x => bare(x) === HERO_IMAGE.replace(/\.[^.]+$/, '').toLowerCase()).forEach(x => cand.push(x));
+    ['wedding', 'pre-wedding'].forEach(k => (photosByCat[k] || []).filter(i => i.type === 'image').forEach(i => cand.push(i.src)));
     const uniq = [...new Set(cand)].slice(0, 16); if (!uniq.length) return;
     let idx = 0, fallback = null;
     const place = (src, img) => {
