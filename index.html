@@ -376,7 +376,7 @@
   const MANUAL = {};
   // Exact cover file (inside assets/) for an album. Used even if auto-detection finds nothing.
   const COVERS = { wedding: 'wedding Cover.jpg' };
-  const BUILD = 'v5-center';
+  const BUILD = 'v6-portrait';
   const SLIDE_MS = 5000;
 
   const IMG_RE = /\.(jpe?g|png|webp|avif|gif)$/i;
@@ -437,7 +437,8 @@
       });
       if (!cover && COVERS[cat.key]) cover = 'assets/' + enc(COVERS[cat.key]);
       if (!entries.length) entries = (MANUAL[cat.key] || []).map(n => ({ dir: cat.folder, name: n }));
-      entries.sort((x, y) => x.name.localeCompare(y.name, undefined, { numeric: true }));
+      // sort ignoring spaces/dashes so "portrait - 3" and "portrait -2" order correctly (1, 2, 3 ... 10)
+      entries.sort((x, y) => norm(x.name).localeCompare(norm(y.name), undefined, { numeric: true }));
       const out = entries.map(e => ({ src: `${e.dir}/${enc(e.name)}`, type: VID_RE.test(e.name) ? 'video' : 'image' }));
       out.cover = cover;
       return out;
